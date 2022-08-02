@@ -1,0 +1,29 @@
+{
+  "name": "imdb-quote-web-scraper",
+  "version": "1.0.0",
+  "description": "Imdb quote web scraper",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashpoz/imdb-quote-web-scraper.git"
+  },
+  "author": "Adrian S. Haynes",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ashpoz/imdb-quote-web-scraper/issues"
+  },
+  "homepage": "https://github.com/ashpoz/imdb-quote-web-scraper#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.2.10"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
