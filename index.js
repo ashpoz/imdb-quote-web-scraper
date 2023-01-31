@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
 import * as cheerio from 'cheerio';
-// import cors from "cors";
 
 import fs from "fs";
 
@@ -61,7 +60,6 @@ const getQuotes = async () => {
   });
   return Promise.all(requests);
 };
-
 
 getQuotes().then(data => {
   fs.writeFile('quotes.json', JSON.stringify(data), err => {
