@@ -2,6 +2,8 @@ import fetch from "node-fetch";
 import * as cheerio from 'cheerio';
 // import cors from "cors";
 
+import fs from "fs";
+
 export const getFilmIds = async () => {
   const response = await fetch("https://www.imdb.com/chart/top");
   const data = await response.text();
@@ -11,11 +13,8 @@ export const getFilmIds = async () => {
     let extractMovId = /(?<=title\/)(.*)(?=\/)/gm;
     let movId = $(el).attr("href").match(extractMovId)[0];
 
-    if (index < 1) {
-      idsArr.push(movId);
-    }
-  })
-  console.log(idsArr);
+    idsArr.push(movId);
+  });
   return idsArr;
 }
 
@@ -26,16 +25,17 @@ const getQuotes = async () => {
     const html = await urls.text();
     const $ = cheerio.load(html);
 
+    let movieTitle = $(".subpage_title_block__right-column a").text().trim();
+    let movieYear = $(".subpage_title_block__right-column span").text().replace(/[{()}]/g, "").trim();
     let quoteArr = [];
+    let charArr = [];
 
-    $(".quote .sodatext").each((_, el) => {
+    $(".quote .sodatext").each((index, el) => {
+      if (index > 5) return;
       // character
       const character = $(el).find(".character");
       // subtext lines
       const fine = $(el).find(".fine").text();
-      // char arr
-      let charArr = [];
-      // new text
       let text = $(el).text().replaceAll(`[${fine}]`, "");
 
       $(character).each((_, charEl) => {
@@ -43,21 +43,31 @@ const getQuotes = async () => {
       });
 
       // replace char names with Char + index
-      // TODO: can move this outside of the fn so it removes ALL ref to chars
       $([...new Set(charArr)]).each((index, item) => {
-        text = text.replaceAll(item, `Character ${index + 1}`);
+        let regex = new RegExp(`\\b${item}\\b`, "gi");
+        text = text.replaceAll(regex, `[Character ${index + 1}]`);
       });
 
-      quoteArr = [...quoteArr, text];
+      quoteArr = [...quoteArr, text.replace(/\n/g, " ").trim()];
     });
 
     return {
-      // urls, do I need this?
+      // grab movie title and year
       id: index,
+      title: movieTitle,
+      year: movieYear,
       quotes: quoteArr
     }
-  })
+  });
   return Promise.all(requests);
-}
+};
 
-getQuotes().then(val => console.log(val[0].quotes[2]));
+
+getQuotes().then(data => {
+  fs.writeFile('quotes.json', JSON.stringify(data), err => {
+    if (err) {
+      console.error(err);
+    }
+    // file written successfully
+  });
+});
